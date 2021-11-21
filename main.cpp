@@ -5,12 +5,14 @@
 #include <ctime>
 #include <string>
 #include <map>
+#include <any>
+#include <cxxabi.h>
 
 using namespace std;
 
 const size_t MAX_QUEUE_SIZE = 6;
 
-void printArray(const vector<int>& array) {
+void print_array(const vector<int>& array) {
     for (int i = 0; i < array.size(); i++) {
         cout << array[i];
         if (array.size() - i > 1) {
@@ -22,35 +24,67 @@ void printArray(const vector<int>& array) {
 const volatile bool ENABLE_DEBUG_LOGS = false;
 const volatile bool ENABLE_INFO_LOGS = true;
 class Logger {
-    static void debug(const vector<int>& array) {
-        if (ENABLE_DEBUG_LOGS) {
-            printArray(array);
+public:
+    static void debug(const std::any& value) {
+        if (!ENABLE_DEBUG_LOGS) {
+            return;
         }
+        Logger::print(value);
     }
-    static void debug(const string& value) {
-        if (ENABLE_DEBUG_LOGS) {
-            cout << value;
+    static void debug(const std::any& value1, const std::any& value2) {
+        if (!ENABLE_DEBUG_LOGS) {
+            return;
         }
+        Logger::print(value1);
+        Logger::print(value2);
     }
-    static void debug(unsigned long long value) {
-        if (ENABLE_DEBUG_LOGS) {
-            cout << value;
+    static void debug(const std::any& value1, const std::any& value2, const std::any& value3) {
+        if (!ENABLE_DEBUG_LOGS) {
+            return;
         }
+        Logger::print(value1);
+        Logger::print(value2);
+        Logger::print(value3);
     }
 
-    static void log(const vector<int>& array) {
-        if (ENABLE_INFO_LOGS) {
-            printArray(array);
+    static void info(const std::any& value) {
+        if (!ENABLE_INFO_LOGS) {
+            return;
         }
+        Logger::print(value);
     }
-    static void log(const string& value) {
-        if (ENABLE_INFO_LOGS) {
-            cout << value;
+    static void info(const std::any& value1, const std::any& value2) {
+        if (!ENABLE_INFO_LOGS) {
+            return;
         }
+        Logger::print(value1);
+        Logger::print(value2);
     }
-    static void log(unsigned long long value) {
-        if (ENABLE_INFO_LOGS) {
-            cout << value;
+    static void info(const std::any& value1, const std::any& value2, const std::any& value3) {
+        if (!ENABLE_INFO_LOGS) {
+            return;
+        }
+        Logger::print(value1);
+        Logger::print(value2);
+        Logger::print(value3);
+    }
+
+private:
+    static void print(std::any value) {
+        string type_name = abi::__cxa_demangle(value.type().name(), nullptr, nullptr, nullptr);
+
+        if (string("std::vector<int, std::allocator<int> >") == type_name) {
+            print_array(std::any_cast<vector<int>>(value));
+        } else if (string("int") == type_name) {
+            cout << std::any_cast<int>(value);
+        } else if (string("bool") == type_name) {
+            cout << std::any_cast<bool>(value);
+        } else if (string("unsigned long long") == type_name) {
+            cout << std::any_cast<unsigned long long>(value);
+        } else if (string("char const*") == type_name) {
+            cout << std::any_cast<char const*>(value);
+        } else {
+            throw std::invalid_argument("Unsupported type: '" + type_name + "'. Please, add its support in Logger class.");
         }
     }
 };
@@ -72,58 +106,58 @@ pair<bool, vector<int>> perform_tournament(const vector<int>& original_array) {
     for (int i = 0; i < min(MAX_QUEUE_SIZE, array_size); i++) {
         int tail = get_first_and_erase(array);
         q.push(tail);
-        logger.debug("\n\nq size after pushing ");
-        logger.debug(tail);
-        logger.debug(": ");
-        log(q.size());
+        Logger::debug("\n\nq size after pushing ");
+        Logger::debug(tail);
+        Logger::debug(": ");
+        Logger::debug(q.size());
 
     }
     winners.push_back(q.top());
-    log("\n\nq size after popping ");
-    log(q.top());
+    Logger::debug("\n\nq size after popping ");
+    Logger::debug(q.top());
     q.pop();
-    log(": ");
-    log(q.size());
+    Logger::debug(": ");
+    Logger::debug(q.size());
 
     int cntr = 0;
     while (!array.empty()) {
         if (array.front() > winners.back()) {
             int tail = get_first_and_erase(array);
             q.push(tail);
-            log("\n\nq size after pushing ");
-            log(tail);
-            log(": ");
-            log(q.size());
+            Logger::debug("\n\nq size after pushing ");
+            Logger::debug(tail);
+            Logger::debug(": ");
+            Logger::debug(q.size());
         } else {
             losers.push_back(get_first_and_erase(array));
         }
 
         if (!q.empty()) {
             winners.push_back(q.top());
-            log("\n\nq size after popping ");
-            log(q.top());
+            Logger::debug("\n\nq size after popping ");
+            Logger::debug(q.top());
             q.pop();
-            log(": ");
-            log(q.size());
+            Logger::debug(": ");
+            Logger::debug(q.size());
         }
 
-        log(cntr++);
+        Logger::debug(cntr++);
     }
     while (!q.empty()) {
-        log(q.empty());
-        log("\n");
-        log(q.size());
-        log("\n");
-        log("before all\n");
+        Logger::debug(q.empty());
+        Logger::debug("\n");
+        Logger::debug(q.size());
+        Logger::debug("\n");
+        Logger::debug("before all\n");
         winners.push_back(q.top());
-        log("after pb all\n");
+        Logger::debug("after pb all\n");
         q.pop();
     }
 
-    log("\n\nwinners:\n");
-    log(winners);
-    log("\n\nlosers:\n");
-    log(losers);
+    Logger::debug("\n\nwinners:\n");
+    Logger::debug(winners);
+    Logger::debug("\n\nlosers:\n");
+    Logger::debug(losers);
 
     if (losers.empty()) {
         return make_pair(true, winners);
@@ -153,15 +187,13 @@ auto get_random_int = [](int min, int max) -> int {
 int main() {
     srand(time(nullptr));
 
-    const size_t array_size = get_random_int(15000, 20000);
-    cout << "array size: " << array_size << "\n";
+    const size_t array_size = get_random_int(15, 20);
+    Logger::info("array size: ", array_size, "\n");
     vector<int> array;
     for (size_t i = 0; i < array_size; i++) {
         array.push_back(get_random_int(1, 10000000));
     }
-    cout << "initial array:\n";
-    printArray(array);
-    cout << "\n";
+    Logger::info("initial array:\n", array, "\n");
 
     map<int, int> item_counts;
     vector<int> distinct_array;
@@ -174,13 +206,10 @@ int main() {
         }
     }
 
-    cout << "distinct array:\n";
-    printArray(distinct_array);
-    cout << "\n\n";
+    Logger::info("distinct array:\n", distinct_array, "\n");
 
     auto sorted_array = tournament_sort(distinct_array);
-    cout << "sorted array:\n";
-    printArray(sorted_array);
+    Logger::info("\nsorted array:\n", sorted_array);
 
     return 0;
 }
