@@ -1,5 +1,6 @@
 #!/bin/bash
-[ -d external/benchmark ] && exit 0
+
+[ -f external/benchmark/include/benchmark/benchmark.h ] && [ -d external/becnhmark/build ] && exit 0
 
 mkdir external && cd external
 git clone https://github.com/google/benchmark.git
