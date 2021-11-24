@@ -64,7 +64,7 @@ void Logger::info(const std::any& value1, const std::any& value2, const std::any
     Logger::print(value3);
 }
 
-void Logger::print(std::any value) {
+void Logger::print(const std::any& value) {
     string type_name = abi::__cxa_demangle(value.type().name(), nullptr, nullptr, nullptr);
 
     if (string("std::vector<int, std::allocator<int> >") == type_name) {
@@ -81,6 +81,8 @@ void Logger::print(std::any value) {
         cout << std::any_cast<unsigned long long>(value);
     } else if (string("char const*") == type_name) {
         cout << std::any_cast<char const*>(value);
+    } else if (string("char") == type_name) {
+        cout << std::any_cast<char>(value);
     } else {
         throw std::invalid_argument("Unsupported type: '" + type_name + "'. Please, add its support in Logger class.");
     }

@@ -12,7 +12,7 @@ public:
     static void info(const std::any& value1, const std::any& value2, const std::any& value3);
 
 private:
-    static void print(std::any value);
+    static void print(const std::any& value);
 };
 
 #endif //ALGORITHMS_COMPLEXITY_LOGGER_H
