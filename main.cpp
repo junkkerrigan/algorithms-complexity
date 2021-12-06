@@ -87,26 +87,7 @@ void BM_std_sort(benchmark::State& state) {
     }
 }
 
-//BENCHMARK(BM_tournament_sort)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10, 1000000)->Setup(setup)->Complexity(benchmark::oNLogN);
-//BENCHMARK(BM_std_sort)->Unit(benchmark::kMillisecond)->RangeMultiplier(2)->Range(10, 10000000)->Setup(setup)->Complexity(benchmark::oNLogN);
-//
-//BENCHMARK_MAIN();
+BENCHMARK(BM_tournament_sort)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10, 1000000)->Setup(setup)->Complexity(benchmark::oNLogN);
+BENCHMARK(BM_std_sort)->Unit(benchmark::kMillisecond)->RangeMultiplier(2)->Range(10, 10000000)->Setup(setup)->Complexity(benchmark::oNLogN);
 
-int main() {
-//    size_t array_size = 20;
-//    vector<int> array = std::move(generate_random_array(array_size));
-//
-    string input_file_name = "input.txt";
-//    ofstream input_file(input_file_name);
-//    input_file << array_size << '\n';
-//    for (int i = 0; i < array_size; i++) {
-//        input_file << array[i];
-//        if (i < array_size - 1) {
-//            input_file << ' ';
-//        }
-//    }
-
-    Logger::debug("start sort\n\n");
-
-    tournament_sort_with_limited_RAM(input_file_name, "output.txt", 10);
-}
+BENCHMARK_MAIN();
