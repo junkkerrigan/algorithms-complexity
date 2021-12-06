@@ -1,12 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <any>
-#include <cxxabi.h>
-
 #include "Logger.h"
-
-using namespace std;
 
 void print_array(const vector<int>& array) {
     for (int i = 0; i < array.size(); i++) {
@@ -17,8 +9,8 @@ void print_array(const vector<int>& array) {
     }
 }
 
-const volatile bool ENABLE_DEBUG_LOGS = 0;
-const volatile bool ENABLE_INFO_LOGS = 0;
+bool ENABLE_DEBUG_LOGS = 1;
+bool ENABLE_INFO_LOGS = 0;
 
 void Logger::debug(const std::any& value) {
     if (!ENABLE_DEBUG_LOGS) {
@@ -81,6 +73,8 @@ void Logger::print(const std::any& value) {
         cout << std::any_cast<unsigned long long>(value);
     } else if (string("char const*") == type_name) {
         cout << std::any_cast<char const*>(value);
+    } else if (string("std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >") == type_name) {
+        cout << std::any_cast<string>(value);
     } else if (string("char") == type_name) {
         cout << std::any_cast<char>(value);
     } else {

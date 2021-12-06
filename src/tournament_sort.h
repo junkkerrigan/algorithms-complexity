@@ -2,7 +2,14 @@
 #define ALGORITHMS_COMPLEXITY_TOURNAMENT_SORT_H
 
 #include <vector>
+#include <queue>
+#include <any>
+#include <cmath>
 
-std::vector<int> tournament_sort(const std::vector<int>&, bool);
+#include "Logger.h"
+
+using namespace std;
+
+vector<int> tournament_sort(const vector<int>&);
 
 #endif //ALGORITHMS_COMPLEXITY_TOURNAMENT_SORT_H

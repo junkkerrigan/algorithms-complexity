@@ -1,13 +1,13 @@
-#include <iostream>
 #include <vector>
 #include <any>
 #include <ctime>
 #include <algorithm>
+#include <fstream>
 
 #include "benchmark/benchmark.h"
 
-#include "src/Logger.h"
 #include "src/tournament_sort.h"
+#include "src/limited_RAM.h"
 
 using namespace std;
 
@@ -47,6 +47,8 @@ void setup(const benchmark::State&) {
 
 void BM_tournament_sort(benchmark::State& state) {
     size_t array_size = state.range(0);
+    state.SetComplexityN(state.range(0));
+
     vector<int> array;
     vector<int> sorted;
 
@@ -55,10 +57,10 @@ void BM_tournament_sort(benchmark::State& state) {
         array = generate_random_array(array_size);
         state.ResumeTiming();
 
-        sorted = tournament_sort(array, true);
+        sorted = tournament_sort(array);
         state.PauseTiming();
 
-        if (!is_sorted(sorted)) {
+        if (!is_sorted(sorted) || array.size() != sorted.size()) {
             state.SkipWithError("Not sorted");
         }
     }
@@ -66,6 +68,8 @@ void BM_tournament_sort(benchmark::State& state) {
 
 void BM_std_sort(benchmark::State& state) {
     size_t array_size = state.range(0);
+    state.SetComplexityN(state.range(0));
+
     vector<int> array;
     vector<int> sorted;
 
@@ -77,13 +81,32 @@ void BM_std_sort(benchmark::State& state) {
         sort(array.begin(), array.end());
         state.PauseTiming();
 
-        if (!is_sorted(sorted)) {
+        if (!is_sorted(sorted) || array.size() != sorted.size()) {
             state.SkipWithError("Not sorted");
         }
     }
 }
 
-BENCHMARK(BM_tournament_sort)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10, 1000000)->Setup(setup);
-//BENCHMARK(BM_std_sort)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10, 10000000)->Setup(setup);
+//BENCHMARK(BM_tournament_sort)->Unit(benchmark::kMillisecond)->RangeMultiplier(10)->Range(10, 1000000)->Setup(setup)->Complexity(benchmark::oNLogN);
+//BENCHMARK(BM_std_sort)->Unit(benchmark::kMillisecond)->RangeMultiplier(2)->Range(10, 10000000)->Setup(setup)->Complexity(benchmark::oNLogN);
+//
+//BENCHMARK_MAIN();
 
-BENCHMARK_MAIN();
+int main() {
+//    size_t array_size = 20;
+//    vector<int> array = std::move(generate_random_array(array_size));
+//
+    string input_file_name = "input.txt";
+//    ofstream input_file(input_file_name);
+//    input_file << array_size << '\n';
+//    for (int i = 0; i < array_size; i++) {
+//        input_file << array[i];
+//        if (i < array_size - 1) {
+//            input_file << ' ';
+//        }
+//    }
+
+    Logger::debug("start sort\n\n");
+
+    tournament_sort_with_limited_RAM(input_file_name, "output.txt", 10);
+}
